@@ -1,0 +1,11 @@
+[package]
+name = "sneedbot"
+version = "0.1.0"
+authors = ["No <bvs@segfaultindustries.com>"]
+edition = "2018"
+
+[dependencies]
+serenity = {version = "0.10", default-features = false, features = ["client", "gateway", "rustls_backend", "model"] }
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+walkdir = "2"
+rand = "0.5.5"
