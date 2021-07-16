@@ -1,6 +1,6 @@
 use std::{env, path::Path};
 use walkdir::WalkDir;
-use rand::Rng;
+//use rand::Rng;
 use std::time::SystemTime;
 
 use serenity::{
@@ -19,6 +19,7 @@ impl EventHandler for Handler {
     //
     // Event handlers are dispatched through a threadpool, and so multiple
     // events can be dispatched simultaneously.
+    
     async fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!no" {
             println!("got a message");
@@ -27,18 +28,19 @@ impl EventHandler for Handler {
             // channel, so log to stdout when some error happens, with a
             // description of it./c/Users/taylo/Pictures/b
             let mut i = 0;
-            let count = WalkDir::new("./B/").into_iter().count();
+            let mut picpath: String = "/media/pics".to_owned();
+            let count = WalkDir::new(&picpath).into_iter().count();
             //let count: u32 = filecount.into();// as u64;
             //let counttmp: u64 = count.into();
             println!("no {}",count);
             let secret_number = (SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as usize) % count;// rand::thread_rng().gen_range(1, count );
             println!("yes");
             let mut filename: String = "attachment://".to_owned();
-            let mut filerelpath: String = "./B/".to_owned();
+            //let mut filerelpath: String = "./B/".to_owned();
 
             println!("got a message, {} files, {} secret",count, secret_number);
 
-            for entry in WalkDir::new("./B/").into_iter().filter_map(|entry| entry.ok()) {
+            for entry in WalkDir::new(&picpath).into_iter().filter_map(|entry| entry.ok()) {
                 i = i + 1;
                 if i == secret_number { 
                     if let Ok(metadata) = entry.metadata() {//.unwrap().is_file() {
@@ -49,7 +51,7 @@ impl EventHandler for Handler {
                         //    Some(x) => {
                             filename.push_str(tmp);
                             println!("file {}",tmp);
-                            filerelpath.push_str(tmp);
+                            picpath.push_str(tmp);
                           //  }
                         //}
                         }
@@ -60,7 +62,7 @@ impl EventHandler for Handler {
                     //filerelpath.push_str(entry.file_name().unwrap().to_str());
             }
 
-            let msg = msg
+            let _msg = msg
                 .channel_id
                 .send_message(&ctx.http, |m| {
                     m.content("Sneed's Feed and Seed, Formerly Chucks.");
@@ -71,7 +73,7 @@ impl EventHandler for Handler {
 
                         e
                     });
-                    m.add_file(AttachmentType::Path(Path::new(&filerelpath)));
+                    m.add_file(AttachmentType::Path(Path::new(&picpath)));
                     m
                 })
                 .await;
