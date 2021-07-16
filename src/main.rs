@@ -62,7 +62,7 @@ impl EventHandler for Handler {
                     //filerelpath.push_str(entry.file_name().unwrap().to_str());
             }
 
-            let _msg = msg
+            let msg = msg
                 .channel_id
                 .send_message(&ctx.http, |m| {
                     m.content("Sneed's Feed and Seed, Formerly Chucks.");
