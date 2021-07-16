@@ -28,7 +28,7 @@ impl EventHandler for Handler {
             // channel, so log to stdout when some error happens, with a
             // description of it./c/Users/taylo/Pictures/b
             let mut i = 0;
-            let mut picpath: String = "/media/pics".to_owned();
+            let mut picpath: String = "/media/pics/".to_owned();
             let count = WalkDir::new(&picpath).into_iter().count();
             //let count: u32 = filecount.into();// as u64;
             //let counttmp: u64 = count.into();
@@ -52,6 +52,7 @@ impl EventHandler for Handler {
                             filename.push_str(tmp);
                             println!("file {}",tmp);
                             picpath.push_str(tmp);
+                            println!("full path is {}",picpath);
                           //  }
                         //}
                         }
