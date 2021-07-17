@@ -1,7 +1,7 @@
 use std::{env, path::Path};
 use walkdir::WalkDir;
-//use rand::Rng;
-use std::time::SystemTime;
+use rand::Rng;
+//use std::time::SystemTime;
 
 use serenity::{
     async_trait,
@@ -33,7 +33,7 @@ impl EventHandler for Handler {
             //let count: u32 = filecount.into();// as u64;
             //let counttmp: u64 = count.into();
             println!("no {}",count);
-            let secret_number = (SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as usize) % count;// rand::thread_rng().gen_range(1, count );
+            let secret_number =  rand::thread_rng().gen_range(1, count );//(SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as usize) % count;
             println!("yes");
             let mut filename: String = "attachment://".to_owned();
             //let mut filerelpath: String = "./B/".to_owned();
