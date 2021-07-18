@@ -2,6 +2,7 @@ use std::{env, path::Path};
 use walkdir::WalkDir;
 use rand::Rng;
 //use std::time::SystemTime;
+use sneedbot::imagegrabber;
 
 use serenity::{
     async_trait,
@@ -61,6 +62,43 @@ impl EventHandler for Handler {
                 }
                     //filename.push_str(entry.file_name().unwrap().to_str());
                     //filerelpath.push_str(entry.file_name().unwrap().to_str());
+            }
+
+            let msg = msg
+                .channel_id
+                .send_message(&ctx.http, |m| {
+                    m.content("Sneed's Feed and Seed, Formerly Chucks.");
+                    m.embed(|e| {
+                        e.title("Random Shitpost");
+                        e.description("no");
+                        e.image(&filename);
+
+                        e
+                    });
+                    m.add_file(AttachmentType::Path(Path::new(&picpath)));
+                    m
+                })
+                .await;
+        }
+        else if msg.content.starts_with("!booru") {
+            let mut filename: String = "attachment://".to_owned();
+            let mut picpath: String = "none".to_owned();
+
+            let v: Vec<&str> = msg.content.splitn(2, ' ').collect();
+
+            let tag = String::from(v[1]);
+            imagegrabber::pick_a_pic(&tag).await.unwrap();
+
+
+
+            for entry in WalkDir::new("./").into_iter().filter_map(|entry| entry.ok()) {
+                let tmp = entry.file_name().to_str().unwrap();
+                if tmp.contains("downloaded") {
+                    filename.push_str(tmp);
+                    picpath = tmp.to_owned();
+                    break;
+                }
+                       
             }
 
             let msg = msg
