@@ -44,6 +44,10 @@ pub mod imagegrabber {
         let pics: Vec<Value> = serde_json::from_str(&res)?;
 
         let count = pics.len();
+        if count < 1 {
+            return Ok("none".to_owned())
+        }
+
         let index = rand::thread_rng().gen_range(0, count-1);
 
        // let pic: Value = serde_json::from_str(&pics[count].data)?;

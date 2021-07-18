@@ -1,4 +1,4 @@
-use std::{env, path::Path};
+use std::{env, path::Path,fs};
 use walkdir::WalkDir;
 use rand::Rng;
 //use std::time::SystemTime;
@@ -86,36 +86,66 @@ impl EventHandler for Handler {
 
             let v: Vec<&str> = msg.content.splitn(2, ' ').collect();
 
-            let tag = String::from(v[1]);
-            imagegrabber::pick_a_pic(&tag).await.unwrap();
-
-
-
             for entry in WalkDir::new("./").into_iter().filter_map(|entry| entry.ok()) {
                 let tmp = entry.file_name().to_str().unwrap();
                 if tmp.contains("downloaded") {
                     filename.push_str(tmp);
+
                     picpath = tmp.to_owned();
+                    
+                    fs::remove_file(&picpath).unwrap();
+                    
                     break;
                 }
                        
             }
 
-            let msg = msg
-                .channel_id
-                .send_message(&ctx.http, |m| {
-                    m.content("Sneed's Feed and Seed, Formerly Chucks.");
-                    m.embed(|e| {
-                        e.title("Random Shitpost");
-                        e.description("no");
-                        e.image(&filename);
+            let tag = String::from(v[1]);
+            let grabbed = imagegrabber::pick_a_pic(&tag).await.unwrap();
 
-                        e
-                    });
-                    m.add_file(AttachmentType::Path(Path::new(&picpath)));
-                    m
-                })
-                .await;
+            if grabbed == "none" {
+                let msg = msg
+                    .channel_id
+                    .send_message(&ctx.http, |m| {
+                        m.content("Danbooru Random Picture");
+                        m.embed(|e| {
+                            e.title("BAD TAG, YOU GET NOTHING");
+                            e.description("bottom text");    
+                            e
+                        });
+                        m
+                    })
+                    .await;
+            }
+            else {
+                for entry in WalkDir::new("./").into_iter().filter_map(|entry| entry.ok()) {
+                    let tmp = entry.file_name().to_str().unwrap();
+                    if tmp.contains("downloaded") {
+                        filename.push_str(tmp);
+                        picpath = tmp.to_owned();
+                        break;
+                    }
+                           
+                }
+    
+                let msg = msg
+                    .channel_id
+                    .send_message(&ctx.http, |m| {
+                        m.content("Danbooru Random Picture");
+                        m.embed(|e| {
+                            e.title("Possibly NSFW");
+                            e.description("bottom text");
+                            e.image(&filename);
+    
+                            e
+                        });
+                        m.add_file(AttachmentType::Path(Path::new(&picpath)));
+                        m
+                    })
+                    .await;
+            }
+
+            
         }
     }
 
