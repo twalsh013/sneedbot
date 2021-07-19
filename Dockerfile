@@ -1,5 +1,7 @@
 FROM ubuntu
 RUN apt-get update
 RUN apt-get upgrade -y
-COPY ./target/aarch64-unknown-linux-gnu/debug/sneedbot /root/
+RUN apt-get install openssl ca-certificates libssl-dev --assume-yes
+RUN ldconfig
+COPY ./goodsneed /root/sneedbot
 CMD /root/sneedbot
