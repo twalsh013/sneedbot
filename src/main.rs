@@ -148,7 +148,7 @@ impl EventHandler for Handler {
 
             
         }
-        else {
+        else if !msg.content.is_empty() {
             let msg = msg
                 .channel_id
                 .send_message(&ctx.http, |m| {

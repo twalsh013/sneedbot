@@ -20,7 +20,7 @@ pub mod imagegrabber {
         //let test: &str = "no";
         let client = reqwest::Client::new();
         let page: u32 =  rand::thread_rng().gen_range(1, 20);
-        let ret: Result<String> = Ok("good".to_owned());
+        //let ret: Result<String> = Ok("good".to_owned());
 
         let mut get_path = String::from("https://danbooru.donmai.us/posts.json?tags=");
         get_path.push_str(tag);
