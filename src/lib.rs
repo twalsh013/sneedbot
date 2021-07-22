@@ -8,16 +8,15 @@ pub mod imagegrabber {
     use std::io;
     use std::fs::File;
     use io::Cursor;
-
     //use serde::{Serialize, Deserialize};
-    //use anyhow;
+    use anyhow::Result as OtherResult;
 
     //#[derive(Serialize, Deserialize, Debug)]
     //struct Image {
     //    data: Value,
     //}
 
-    pub async fn pick_a_pic(tag: &String) -> Result<String> {//, reqwest::Error> {
+    pub async fn pick_a_pic(tag: &String) -> OtherResult<String, anyhow::Error> {//, reqwest::Error> {
         //let test: &str = "no";
         let client = reqwest::Client::new();
         let page: u32 =  rand::thread_rng().gen_range(1, 20);
@@ -33,7 +32,7 @@ pub mod imagegrabber {
         let res = client
         .get(get_path)
         .send()
-        .await.unwrap().text().await.unwrap();
+        .await?.text().await?;
 
         //let res = res.text().await?;
 
@@ -68,8 +67,8 @@ pub mod imagegrabber {
             path.push_str(".jpeg");
         }
 
-        let rtmp = reqwest::get(url).await.unwrap();
-        let mut content = Cursor::new(rtmp.bytes().await.unwrap());
+        let rtmp = reqwest::get(url).await?;
+        let mut content = Cursor::new(rtmp.bytes().await?);
         //let btmp = rtmp.text_with_charset("utf-8").await.unwrap();//.as_bytes();
         //let resp = btmp.as_bytes();
         //println!("{}",btmp);
@@ -80,6 +79,6 @@ pub mod imagegrabber {
         
         io::copy(&mut content, &mut out).expect("failed to copy content");
 
-        ret
+        Ok("ok".to_owned())
     }
 }

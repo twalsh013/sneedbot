@@ -4,6 +4,7 @@ use rand::Rng;
 //use std::time::SystemTime;
 use sneedbot::imagegrabber;
 
+
 use serenity::{
     async_trait,
     http::AttachmentType,
@@ -146,6 +147,15 @@ impl EventHandler for Handler {
             }
 
             
+        }
+        else {
+            let msg = msg
+                .channel_id
+                .send_message(&ctx.http, |m| {
+                    m.content("I don't understand what the fuck you said.");
+                    m
+                })
+                .await;
         }
     }
 
