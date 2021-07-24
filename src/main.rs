@@ -23,65 +23,66 @@ impl EventHandler for Handler {
     // events can be dispatched simultaneously.
     
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content == "!no" {
-            println!("got a message");
-            // Sending a message can fail, due to a network error, an
-            // authentication error, or lack of permissions to post in the
-            // channel, so log to stdout when some error happens, with a
-            // description of it./c/Users/taylo/Pictures/b
-            let mut i = 0;
-            let mut picpath: String = "/media/pics/".to_owned();
-            let count = WalkDir::new(&picpath).into_iter().count();
-            //let count: u32 = filecount.into();// as u64;
-            //let counttmp: u64 = count.into();
-            println!("no {}",count);
-            let secret_number =  rand::thread_rng().gen_range(1, count );//(SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as usize) % count;
-            println!("yes");
-            let mut filename: String = "attachment://".to_owned();
-            //let mut filerelpath: String = "./B/".to_owned();
+        if msg.content.starts_with("!") {
+            if msg.content == "!no" {
+                println!("got a message");
+                // Sending a message can fail, due to a network error, an
+                // authentication error, or lack of permissions to post in the
+                // channel, so log to stdout when some error happens, with a
+                // description of it./c/Users/taylo/Pictures/b
+                let mut i = 0;
+                let mut picpath: String = "/media/pics/".to_owned();
+                let count = WalkDir::new(&picpath).into_iter().count();
+                //let count: u32 = filecount.into();// as u64;
+                //let counttmp: u64 = count.into();
+                println!("no {}",count);
+                let secret_number =  rand::thread_rng().gen_range(1, count );//(SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as usize) % count;
+                println!("yes");
+                let mut filename: String = "attachment://".to_owned();
+                //let mut filerelpath: String = "./B/".to_owned();
 
-            println!("got a message, {} files, {} secret",count, secret_number);
+                println!("got a message, {} files, {} secret",count, secret_number);
 
-            for entry in WalkDir::new(&picpath).into_iter().filter_map(|entry| entry.ok()) {
-                i = i + 1;
-                if i == secret_number { 
-                    if let Ok(metadata) = entry.metadata() {//.unwrap().is_file() {
-                        if metadata.is_file() {
-                            let tmp = entry.file_name().to_str().unwrap();
+                for entry in WalkDir::new(&picpath).into_iter().filter_map(|entry| entry.ok()) {
+                    i = i + 1;
+                    if i == secret_number { 
+                        if let Ok(metadata) = entry.metadata() {//.unwrap().is_file() {
+                            if metadata.is_file() {
+                                let tmp = entry.file_name().to_str().unwrap();
 
-                       // match tmp {
-                        //    Some(x) => {
-                            filename.push_str(tmp);
-                            println!("file {}",tmp);
-                            picpath.push_str(tmp);
-                            println!("full path is {}",picpath);
-                          //  }
-                        //}
+                        // match tmp {
+                            //    Some(x) => {
+                                filename.push_str(tmp);
+                                println!("file {}",tmp);
+                                picpath.push_str(tmp);
+                                println!("full path is {}",picpath);
+                            //  }
+                            //}
+                            }
                         }
+                        break
                     }
-                    break
+                        //filename.push_str(entry.file_name().unwrap().to_str());
+                        //filerelpath.push_str(entry.file_name().unwrap().to_str());
                 }
-                    //filename.push_str(entry.file_name().unwrap().to_str());
-                    //filerelpath.push_str(entry.file_name().unwrap().to_str());
+
+                let msg = msg
+                    .channel_id
+                    .send_message(&ctx.http, |m| {
+                        m.content("Sneed's Feed and Seed, Formerly Chucks.");
+                        m.embed(|e| {
+                            e.title("Random Shitpost");
+                            e.description("no");
+                            e.image(&filename);
+
+                            e
+                        });
+                        m.add_file(AttachmentType::Path(Path::new(&picpath)));
+                        m
+                    })
+                    .await;
             }
-
-            let msg = msg
-                .channel_id
-                .send_message(&ctx.http, |m| {
-                    m.content("Sneed's Feed and Seed, Formerly Chucks.");
-                    m.embed(|e| {
-                        e.title("Random Shitpost");
-                        e.description("no");
-                        e.image(&filename);
-
-                        e
-                    });
-                    m.add_file(AttachmentType::Path(Path::new(&picpath)));
-                    m
-                })
-                .await;
-        }
-        else if msg.content.starts_with("!booru") {
+            else if msg.content.starts_with("!booru") {
             let mut filename: String = "attachment://".to_owned();
             let mut picpath: String = "none".to_owned();
 
@@ -117,45 +118,46 @@ impl EventHandler for Handler {
                         m
                     })
                     .await;
-            }
-            else {
-                for entry in WalkDir::new("./").into_iter().filter_map(|entry| entry.ok()) {
-                    let tmp = entry.file_name().to_str().unwrap();
-                    if tmp.contains("downloaded") {
-                        filename.push_str(tmp);
-                        picpath = tmp.to_owned();
-                        break;
-                    }
-                           
                 }
+                else {
+                    for entry in WalkDir::new("./").into_iter().filter_map(|entry| entry.ok()) {
+                        let tmp = entry.file_name().to_str().unwrap();
+                        if tmp.contains("downloaded") {
+                            filename.push_str(tmp);
+                            picpath = tmp.to_owned();
+                            break;
+                        }
+                           
+                    }
     
+                    let msg = msg
+                        .channel_id
+                        .send_message(&ctx.http, |m| {
+                            m.content("Danbooru Random Picture");
+                            m.embed(|e| {
+                                e.title("Possibly NSFW");
+                                e.description("bottom text");
+                                e.image(&filename);
+    
+                                e
+                            });
+                            m.add_file(AttachmentType::Path(Path::new(&picpath)));
+                            m
+                        })
+                        .await;
+                }
+
+            
+            }
+            else if !msg.content.is_empty() && msg.author.name != String::from("SneedBot") {
                 let msg = msg
                     .channel_id
                     .send_message(&ctx.http, |m| {
-                        m.content("Danbooru Random Picture");
-                        m.embed(|e| {
-                            e.title("Possibly NSFW");
-                            e.description("bottom text");
-                            e.image(&filename);
-    
-                            e
-                        });
-                        m.add_file(AttachmentType::Path(Path::new(&picpath)));
+                        m.content("I don't understand what the fuck you said.");
                         m
                     })
                     .await;
             }
-
-            
-        }
-        else if !msg.content.is_empty() && msg.author.name != String::from("SneedBot") {
-            let msg = msg
-                .channel_id
-                .send_message(&ctx.http, |m| {
-                    m.content("I don't understand what the fuck you said.");
-                    m
-                })
-                .await;
         }
     }
 

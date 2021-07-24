@@ -4,7 +4,7 @@
 
 pub mod imagegrabber {
     use rand::Rng;
-    use serde_json::{Result, Value};
+    use serde_json::Value;
     use std::io;
     use std::fs::File;
     use io::Cursor;
