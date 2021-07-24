@@ -7,4 +7,9 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 COPY . /home/build
 ENV PATH=$PATH:$HOME/.cargo/bin
 RUN cd /home/build; $HOME/.cargo/bin/cargo build --release
-CMD /home/build/target/release/sneedbot
+
+FROM ubuntu
+RUN apt-get update; apt-get upgrade -y; DEBIAN_FRONTEND="noninteractive" apt-get install libssl-dev openssl ca-certificates --assume-yes --fix-missing
+WORKDIR /root/
+COPY --from=0 /home/build/target/release/sneedbot ./
+CMD ["./sneedbot"]
