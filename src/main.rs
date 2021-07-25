@@ -83,41 +83,41 @@ impl EventHandler for Handler {
                     .await;
             }
             else if msg.content.starts_with("!booru") {
-            let mut filename: String = "attachment://".to_owned();
-            let mut picpath: String = "none".to_owned();
+                let mut filename: String = "attachment://".to_owned();
+                let mut picpath: String = "none".to_owned();
 
-            let v: Vec<&str> = msg.content.splitn(2, ' ').collect();
+                let v: Vec<&str> = msg.content.splitn(2, ' ').collect();
 
-            for entry in WalkDir::new("./").into_iter().filter_map(|entry| entry.ok()) {
-                let tmp = entry.file_name().to_str().unwrap();
-                if tmp.contains("downloaded") {
-                    filename.push_str(tmp);
+                for entry in WalkDir::new("./").into_iter().filter_map(|entry| entry.ok()) {
+                    let tmp = entry.file_name().to_str().unwrap();
+                    if tmp.contains("downloaded") {
+                        filename.push_str(tmp);
 
-                    picpath = tmp.to_owned();
+                        picpath = tmp.to_owned();
                     
-                    fs::remove_file(&picpath).unwrap();
+                        fs::remove_file(&picpath).unwrap();
                     
-                    break;
-                }
+                        break;
+                    }
                        
-            }
+                }
 
-            let tag = String::from(v[1]);
-            let grabbed = imagegrabber::pick_a_pic(&tag).await.unwrap();
+                let tag = String::from(v[1]);
+                let grabbed = imagegrabber::pick_a_pic(&tag).await.unwrap();
 
-            if grabbed == "none" {
-                let msg = msg
-                    .channel_id
-                    .send_message(&ctx.http, |m| {
-                        m.content("Danbooru Random Picture");
-                        m.embed(|e| {
-                            e.title("BAD TAG, YOU GET NOTHING");
-                            e.description("bottom text");    
-                            e
-                        });
-                        m
-                    })
-                    .await;
+                if grabbed == "none" {
+                    let msg = msg
+                        .channel_id
+                        .send_message(&ctx.http, |m| {
+                            m.content("Danbooru Random Picture");
+                            m.embed(|e| {
+                                e.title("BAD TAG, YOU GET NOTHING");
+                                e.description("bottom text");    
+                                e
+                            });
+                            m
+                        })
+                        .await;
                 }
                 else {
                     for entry in WalkDir::new("./").into_iter().filter_map(|entry| entry.ok()) {
@@ -148,6 +148,19 @@ impl EventHandler for Handler {
                 }
 
             
+            }
+            else if msg.content.starts_with("!say") && msg.author.name != String::from("SneedBot") {
+                let v: Vec<&str> = msg.content.splitn(2, ' ').collect();
+                let msg_string = String::from(v[1]);
+                println!("msg: {}",msg_string);
+                let msg = msg
+                    .channel_id
+                    .send_message(&ctx.http, |m| {
+                        m.content(msg_string);
+                        m.tts(true);
+                        m
+                    })
+                    .await;
             }
             else if !msg.content.is_empty() && msg.author.name != String::from("SneedBot") {
                 let msg = msg
